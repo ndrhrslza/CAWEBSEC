@@ -1,0 +1,42 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+}
+
+body{
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+h1{
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+
+}
+
+p{
+    font-size: 1rem;
+    color: #333;
+
+}
+.container{
+    position: absolute;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container header{
+    font-size: medium;
+    position: relative;
+    margin: center;
+    color: black;
+    font-weight: 500;
+    text-align: center;
+    padding: 10px;
+}
