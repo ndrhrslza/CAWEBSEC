@@ -1,38 +1,47 @@
 <?php
-if($_SERVER['REQUEST_METHOD'] == "POST") {
+session_start();
+include 'db.php'; // Include database connection
 
-    //retrieve from data
-    $username = $_POST['username'];
+// Check if email and password are set in $_POST
+if (isset($_POST['email'], $_POST['password'])) {
+    // Get user input   
+    $email = $_POST['email'];
     $password = $_POST['password'];
 
-    //hash the password
-    $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+    // Retrieve user from database
+    $stmt = $mysqli->prepare("SELECT id, email, password FROM login WHERE email = ?");
+    $stmt->bind_param("s", $email);
+    $stmt->execute();
+    $result = $stmt->get_result();
 
-    //Database connection
-    $host = "localhost";
-    $dbusername = "root";
-    $dbpassword = "";
-    $dbname = "auth";
+    // Check if a row was returned
+    if ($result->num_rows == 1) {
+        // Fetch the user's data
+        $user = $result->fetch_assoc();
 
-    $conn = new mysqli($host, $dbusername, $dbpassword, $dbname);
+        // Verify password
+        if (password_verify($password, $user['password'])) {
+            // Authentication successful
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['user_email'] = $user['email'];
+            $_SESSION['user_password'] = $user['password'];
 
-    if($conn->connect_error) {
-        die('Connection Failed : '.$conn->connect_error);
-    }
-
-    //validate login authentication
-    $query = "SELECT * FROM login WHERE username = '$username' AND password = '$password'";
-
-    $result = $conn->query($query);
-
-    if($result->num_rows == 1) {
-        header("Location: userdetails.html");
-        exit(); //login success
+            header("Location: details.php");
+            exit();
+        } else {
+            // Invalid password
+            $errorMessage = "Invalid email or password.";
+        }
     } else {
-        exit(); //login failed
+        // No user found with the given email
+        $errorMessage = "Invalid email or password.";
     }
-
-    $conn->close();
+} else {
+    // Email or password not provided
+    $errorMessage = "No email and password provided.";
 }
 
+// If authentication fails or no credentials provided, redirect back to login page with error message
+echo "<script>alert('$errorMessage'); window.history.back();</script>";
+exit();
 ?>
